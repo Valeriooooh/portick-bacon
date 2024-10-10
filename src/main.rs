@@ -98,7 +98,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 let mess = PortickMessage::Transaction{ from: a[0].to_string(), to: a[1].to_string(), ammount: a[2].to_string() };
                 if let Err(e) = swarm
                     .behaviour_mut().gossipsub
-                    .publish(topic.clone(), m.clone()) {
+                    .publish(topic.clone(), serde_json::to_vec(&mess).unwrap()) {
                     println!("Publish error: {e:?}");
                 }
             }

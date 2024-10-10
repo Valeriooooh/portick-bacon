@@ -89,7 +89,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Kick it off
     loop {
         select! {
-            Ok(Some(line)) = stdin.next_line() => {
+            Ok(Some(_line)) = stdin.next_line() => {
+                let a = _line.split_whitespace();
+                let a: Vec<&str> = a.into_iter().collect();
+                if a.len() != 3{
+                    continue;
+                }
+                let mess = PortickMessage::Transaction{ from: a[0].to_string(), to: a[1].to_string(), ammount: a[2].to_string() };
                 if let Err(e) = swarm
                     .behaviour_mut().gossipsub
                     .publish(topic.clone(), m.clone()) {
@@ -124,4 +130,5 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     }
+    Ok(())
 }

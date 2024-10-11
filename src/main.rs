@@ -1,9 +1,10 @@
 use futures::stream::StreamExt;
-use libp2p::{gossipsub, mdns, noise, swarm::NetworkBehaviour, swarm::SwarmEvent, tcp, yamux};
+use libp2p::{gossipsub, mdns, noise, swarm::NetworkBehaviour, swarm::SwarmEvent, tcp, yamux, PeerId};
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::DefaultHasher;
 use std::error::Error;
 use std::hash::{Hash, Hasher};
+use std::str::FromStr;
 use std::time::Duration;
 use tokio::{io, io::AsyncBufReadExt, select};
 use tracing::Level;
@@ -93,6 +94,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 let a = _line.split_whitespace();
                 let a: Vec<&str> = a.into_iter().collect();
                 if a.len() != 3{
+                    continue;
+                }
+                if a.len() == 1{
+                    swarm.behaviour_mut().gossipsub.add_explicit_peer(&PeerId::from_str(a[0].clone()).unwrap());
+                    println!("Peer add {a:?}");
                     continue;
                 }
                 let mess = PortickMessage::Transaction{ from: a[0].to_string(), to: a[1].to_string(), ammount: a[2].to_string() };
